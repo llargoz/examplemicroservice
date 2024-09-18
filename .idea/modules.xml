@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/AccountService/AccountService.iml" filepath="$PROJECT_DIR$/AccountService/AccountService.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CashingMicroservice.iml" filepath="$PROJECT_DIR$/CashingMicroservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PaymentService/PaymentService.iml" filepath="$PROJECT_DIR$/PaymentService/PaymentService.iml" />
+    </modules>
+  </component>
+</project>

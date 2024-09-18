@@ -1,0 +1,134 @@
+services:
+
+  payment-database:
+    image: 'postgres:latest'
+    container_name: 'payment-database'
+    environment:
+      - 'POSTGRES_DB=payment'
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_PASSWORD=pass'
+    ports:
+      - '5432:5432'
+
+  notification-database:
+    image: 'postgres:latest'
+    container_name: 'notification-database'
+    environment:
+      - 'POSTGRES_DB=notification'
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_PASSWORD=pass'
+    ports:
+      - '5433:5432'
+
+  account-database:
+    image: 'postgres:latest'
+    container_name: 'account-database'
+    environment:
+      - 'POSTGRES_DB=account'
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_PASSWORD=pass'
+    ports:
+      - '5434:5432'
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - '2181:2181'
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka-1:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka-1
+    ports:
+      - '9092:9092'
+      - '29092:29092'
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,OUTSIDE://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-1:9092,OUTSIDE://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    depends_on:
+      zookeeper:
+        condition: service_started
+
+  kafka-2:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka-2
+    ports:
+      - '9093:9093'
+      - '29093:29093'
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9093,OUTSIDE://0.0.0.0:29093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-2:9093,OUTSIDE://localhost:29093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    depends_on:
+      zookeeper:
+        condition: service_started
+
+  kafka-3:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka-3
+    ports:
+      - '9094:9094'
+      - '29094:29094'
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9094,OUTSIDE://0.0.0.0:29094
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-3:9094,OUTSIDE://localhost:29094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    depends_on:
+      zookeeper:
+        condition: service_started
+
+  payment-service:
+    container_name: payment-service
+    ports:
+      - '8080:8080'
+    build:
+      context: ./PaymentService
+      dockerfile: Dockerfile
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - payment-database
+
+  notification-service:
+    container_name: notification-service
+    ports:
+      - '8081:8081'
+    build:
+      context: ./NotificationService
+      dockerfile: Dockerfile
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - notification-database
+      - payment-service
+
+  account-service:
+    container_name: account-service
+    ports:
+      - '8082:8082'
+    build:
+      context: ./AccountService
+      dockerfile: Dockerfile
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - account-database
+      - payment-service

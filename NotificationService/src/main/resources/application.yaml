@@ -1,0 +1,26 @@
+server:
+  port:
+    8081
+
+spring:
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://notification-database:5432/notification
+    username: postgres
+    password: pass
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  kafka:
+    bootstrap-servers: kafka-1:9092, kafka-2:9093
+    topic:
+      name: payment-created-events-topic
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: payment-events
+      properties:
+        spring.json.trusted.packages: "*"

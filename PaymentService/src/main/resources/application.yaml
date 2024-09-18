@@ -1,0 +1,30 @@
+server:
+  port: 8080
+
+grpc:
+  client:
+    account-service:
+      address: static://account-service:9090
+      negotiation-type: plaintext
+
+spring:
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://payment-database:5432/payment
+    username: postgres
+    password: pass
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  kafka:
+    bootstrap-servers: kafka-1:9092, kafka-2:9093
+    topic:
+      name: payment-created-events-topic
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        enable.idempotence: true

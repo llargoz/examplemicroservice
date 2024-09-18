@@ -1,0 +1,18 @@
+server:
+  port: 8082
+
+
+spring:
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://account-database:5432/account
+    username: postgres
+    password: pass
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+grpc:
+  server:
+    port: 9090
